@@ -1306,8 +1306,6 @@ public class EgaDemoClient {
                 System.out.println("Post-Download: No outstanding Tickets");
             }
 
-            System.out.println("Download Iteration Completed. Retry loop for " + numTicketsPost + " unsuccessful downloads.");
-            
             // Repeat if there are still tickets in the request, and retry-count < 3
         } while (numTicketsPost > 0 && numTickets!=numTicketsPost && count++ < 3);
         
@@ -1432,7 +1430,7 @@ public class EgaDemoClient {
             for (int i=0; i<f.length; i++) { // get result for each download attempt, in sequence
                 try {
                     String stat = f[i].get().toString(); // Error...
-                    if (stat.startsWith("Download Failed.") || stat.equalsIgnoreCase("Download Failed.")) { // add failed attempts to new list
+                    if (stat.startsWith("Download Failed") || stat.equalsIgnoreCase("Download Failed")) { // add failed attempts to new list
                         t_.add(t.get(i));
                     } else {// otherwise, print result
                         System.out.println(stat);
@@ -1446,8 +1444,9 @@ public class EgaDemoClient {
                     System.out.println("Throwable error: " + ex.getLocalizedMessage());
                 }
             }
+
+            System.out.println("Iteration " + (5 - countdown) + " Done! (FAILED: " + t_.size() + "; SUCCEEDED: " + (t.size()-t_.size()) + ")");
             t = t_; // replace original list with list of failed downloads
-            System.out.println("Iteration Done! (" + t.size() + " / " + t__.size() + ")");
         }
         
         if (theTimer!=null) theTimer.cancel();

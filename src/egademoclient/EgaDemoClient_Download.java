@@ -109,9 +109,7 @@ public class EgaDemoClient_Download extends Thread implements Callable {
                 this.result += "   SKIP";
             }
         }
-        
-        System.out.println("Completed download: " + this.down_name + ": " + this.success + "  (" + this.index + "/" + this.tot + ")");
-        
+
         return this.result;
     }
     
