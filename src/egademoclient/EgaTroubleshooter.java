@@ -97,7 +97,7 @@ public class EgaTroubleshooter {
             Socket socket = new Socket("www.google.com", 80);
             System.out.println("-1- " + socket.toString());
         } catch (IOException e) {
-            System.out.println("Connect Error http: " + e.getLocalizedMessage());
+            System.err.println("Connect Error http: " + e.getLocalizedMessage());
             return false;
         }
 
@@ -110,6 +110,7 @@ public class EgaTroubleshooter {
             System.out.println("-2- " + sslsocket.toString());
         } catch (IOException ex) {
             Logger.getLogger(EgaTroubleshooter.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
             return false;
         }
         
@@ -139,9 +140,11 @@ public class EgaTroubleshooter {
             System.out.println("Pinging EGA: " + ping);
         } catch (IOException ex) {
             Logger.getLogger(EgaTroubleshooter.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
             return false;
         } catch (InterruptedException ex) {
             Logger.getLogger(EgaTroubleshooter.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
             return false;
         }
        
@@ -187,7 +190,7 @@ public class EgaTroubleshooter {
             }
             
         } catch (Exception ex) {
-            System.out.println(ex.toString());
+            System.err.println(ex.toString());
             return false;
         }
         
@@ -263,11 +266,11 @@ public class EgaTroubleshooter {
                         result.add(t.get(i)); // Add completed ticket
                     }
                 } catch (InterruptedException | ExecutionException ex) {
-                    System.out.println("["+i+"] " + ex.getLocalizedMessage());
+                    System.err.println("["+i+"] " + ex.getLocalizedMessage());
                     t_.add(t.get(i));
                 } catch (Throwable ex) {
                     // Don't re-try ... for now
-                    System.out.println("Throwable error: " + ex.getLocalizedMessage());
+                    System.err.println("Throwable error: " + ex.getLocalizedMessage());
                 }
             }
             t = t_; // replace original list with list of failed downloads

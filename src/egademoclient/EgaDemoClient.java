@@ -122,7 +122,7 @@ public class EgaDemoClient {
             }
         }
         catch(IOException ex) {
-           //ex.printStackTrace(); // for now, ignore it.
+           ex.printStackTrace(); // for now, ignore it.
         }        
 
         try {
@@ -151,7 +151,7 @@ public class EgaDemoClient {
             }
         }
         catch(IOException ex) {
-           //ex.printStackTrace(); // for now, ignore it.
+           ex.printStackTrace(); // for now, ignore it.
         }
         
         System.out.println("Ega Demo Download Client  Version: " + this.version); 
@@ -196,7 +196,9 @@ public class EgaDemoClient {
         while (!login && (login_counter-->0)) { // try 3 times to log in
             login = this.api.login(username, password.toCharArray(), useDB);
             if (!login)
-                try {Thread.sleep(575);} catch (InterruptedException ex) {}
+                try {Thread.sleep(575);} catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
         }
         if (!login) {
             this.api = null;
@@ -287,7 +289,7 @@ public class EgaDemoClient {
             s.close();    
         }
         catch(IOException ex) {
-           //ex.printStackTrace(); // for now, ignore it.
+           ex.printStackTrace(); // for now, ignore it.
         }
         
         String text = sb.toString();
@@ -418,6 +420,7 @@ public class EgaDemoClient {
                 sb.append("  ").append(ds[i]).append("\n");
         } catch (Throwable t) {
             sb.append("No Datasets found\n");
+            t.printStackTrace();
         }
         
         return sb.toString();
@@ -443,6 +446,7 @@ public class EgaDemoClient {
                 sb.append("  ").append(ds[i].getFileName()).append("  ").append(ds[i].getFileSize()).append("  ").append(ds[i].getFileID()).append("  ").append(ds[i].getStatus()).append("\n");
         } catch (Throwable t) {
             sb.append("Request type: ").append(type).append(", ID: ").append(id).append(" produced no results\n");
+            t.printStackTrace();
         }
         return sb.toString();
     }
@@ -460,6 +464,7 @@ public class EgaDemoClient {
                 sb.append("  ").append(ds[i].getFileName()).append("  ").append(ds[i].getFileSize()).append("  ").append(ds[i].getFileID()).append("  ").append(ds[i].getStatus()).append("\n");
         } catch (Throwable t) {
             sb.append("Request for file: ").append(fileid).append(" produced no results\n");
+            t.printStackTrace();
         }
         
         return sb.toString();
@@ -566,6 +571,7 @@ public class EgaDemoClient {
 
             } catch (Throwable t) {
                 sb.append("Error retrieving Requests.\n");
+                t.printStackTrace();
             }
         } else {
             sb.append("Error retrieving requests\n");
@@ -598,6 +604,7 @@ public class EgaDemoClient {
             }
         } catch (Throwable t) {
             sb.append("No Current Requests found\n");
+            t.printStackTrace();
         }
         return sb.toString();
     }
@@ -625,6 +632,7 @@ public class EgaDemoClient {
                 sb.append("  ").append(ds[i].getTicket()).append("\t").append(ds[i].getLabel()).append("\n");
         } catch (Throwable t) {
             sb.append("No Current Requests found\n");
+            t.printStackTrace();
         }
         return sb.toString();
     }
@@ -642,6 +650,7 @@ public class EgaDemoClient {
                 sb.append("  ").append(ds[i].getTicket()).append("\n");
         } catch (Throwable t) {
             sb.append("No Current Requests found\n");
+            t.printStackTrace();
         }
         return sb.toString();
     }
@@ -664,6 +673,7 @@ public class EgaDemoClient {
                         .append("  Request: ").append(ds[i].getLabel()).append("\n");
         } catch (Throwable t) {
             sb.append("No Details for request ").append(ticket).append(" found.\n");
+            t.printStackTrace();
         }
         return sb.toString();
     }
@@ -747,6 +757,7 @@ public class EgaDemoClient {
             sb.append("Error requesting this!\n");
             sb.append("   Possible causes: incorrect id, or requested files(s) are pending\n");
             sb.append("   (pending files have a length of -1 bytes and can't be downloaded yet).\n");
+            t.printStackTrace();
         }
         return sb.toString();
     }
@@ -770,6 +781,7 @@ public class EgaDemoClient {
             }
         } catch (Throwable t) {
             sb.append("Error requesting this!\n");
+            t.printStackTrace();
         }
         return sb.toString();
     }
@@ -858,6 +870,7 @@ public class EgaDemoClient {
             runDownParRetry(ds, threads, dev_null_, descriptor);
         } catch (IOException ex) {
             Logger.getLogger(EgaDemoClient.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
         
         // Step 3: Return status
@@ -900,6 +913,7 @@ public class EgaDemoClient {
             //runDownParPool(ds, threads, false, false);
         } catch (IOException ex) {
             Logger.getLogger(EgaDemoClient.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
         
         // Step 3: Return status
@@ -965,6 +979,7 @@ public class EgaDemoClient {
                 sb.append("Rate: ").append(rate).append(" MB/s\n");
             } catch (Throwable t) {
                 sb.append("Error requesting this!\n");
+                t.printStackTrace();
             }
         }
         return sb.toString();
@@ -1306,8 +1321,6 @@ public class EgaDemoClient {
                 System.out.println("Post-Download: No outstanding Tickets");
             }
 
-            System.out.println("Download Iteration Completed. Retry loop for " + numTicketsPost + " unsuccessful downloads.");
-            
             // Repeat if there are still tickets in the request, and retry-count < 3
         } while (numTicketsPost > 0 && numTickets!=numTicketsPost && count++ < 3);
         
@@ -1432,22 +1445,23 @@ public class EgaDemoClient {
             for (int i=0; i<f.length; i++) { // get result for each download attempt, in sequence
                 try {
                     String stat = f[i].get().toString(); // Error...
-                    if (stat.startsWith("Download Failed.") || stat.equalsIgnoreCase("Download Failed.")) { // add failed attempts to new list
+                    if (stat.startsWith("Download Failed") || stat.equalsIgnoreCase("Download Failed")) { // add failed attempts to new list
                         t_.add(t.get(i));
                     } else {// otherwise, print result
                         System.out.println(stat);
                         result.add(t.get(i).getTicket()); // Add completed ticket
                     }
                 } catch (InterruptedException | ExecutionException ex) {
-                    System.out.println("["+i+"] " + ex.getLocalizedMessage());
+                    System.err.println("["+i+"] " + ex.getLocalizedMessage());
                     t_.add(t.get(i));
                 } catch (Throwable ex) {
                     // Don't re-try ... for now
-                    System.out.println("Throwable error: " + ex.getLocalizedMessage());
+                    System.err.println("Throwable error: " + ex.getLocalizedMessage());
                 }
             }
+
+            System.out.println("Iteration " + (5 - countdown) + " Done! (FAILED: " + t_.size() + "; SUCCEEDED: " + (t.size()-t_.size()) + ")");
             t = t_; // replace original list with list of failed downloads
-            System.out.println("Iteration Done! (" + t.size() + " / " + t__.size() + ")");
         }
         
         if (theTimer!=null) theTimer.cancel();
@@ -1455,7 +1469,9 @@ public class EgaDemoClient {
         theTimer = null;
         executorService.shutdown(); // Done - shut down executor
         while (!executorService.isTerminated()) {
-            try {Thread.sleep(1000);} catch (InterruptedException ex) {;}
+            try {Thread.sleep(1000);} catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
         }
         System.out.println("Download Attempt Completed. " + result.size() + " of " + t__.size() + " tickets downloaded successfully.");
         
@@ -1652,7 +1668,7 @@ public class EgaDemoClient {
             
         } catch (ParseException ex) {
             formatter.printHelp( "java -jar EgaDemoClient.jar", options, true );            
-            System.out.println("Unrecognized Parameter. " + ex.getLocalizedMessage());
+            System.err.println("Unrecognized Parameter. " + ex.getLocalizedMessage());
             Logger.getLogger(EgaDemoClient.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -1704,13 +1720,14 @@ public class EgaDemoClient {
                     } else
                         System.out.println("Can't log in to EGA Service. Is the username/password correct?\nIf this persists, please contact the EGA Helpdesk.)");
                 } else
-                    System.out.println("EGA Servers not reachable.");
+                    System.err.println("EGA Servers not reachable.");
             } else
-                System.out.println("Local Firewall appears to block Java from accessing the Internet.");
+                System.err.println("Local Firewall appears to block Java from accessing the Internet.");
             
             return;
         } catch (NoSuchAlgorithmException | KeyManagementException ex) {
             Logger.getLogger(EgaDemoClient.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
         
         return;
@@ -1726,7 +1743,7 @@ public class EgaDemoClient {
         try {
             ServerSocket serverSocket = new ServerSocket(65416, 1, InetAddress.getByName(null));
         } catch (Throwable th) {
-            System.out.println("Only 1 instance of the download client should be used at a time.\n");
+            System.err.println("Only 1 instance of the download client should be used at a time.\n");
             //return;
         }
         
